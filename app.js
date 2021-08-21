@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
+const multer = require('multer');
 const { validateAuth } = require('./api/middleware/validate-auth');
 
 const app = express();
@@ -24,5 +25,6 @@ app.use(cors());
 
 app.use('/auth', authRoutes);
 app.use('/post', validateAuth, postRoutes);
+app.use('/frindes', validateAuth, postRoutes);
 
 module.exports = app;

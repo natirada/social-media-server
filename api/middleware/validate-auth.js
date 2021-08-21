@@ -4,12 +4,12 @@ const Joi = require('joi');
 exports.validateAuth = (req, res, next) => {
    try {
       const [_, token] = req.headers.authorization.split(' ');
-      const isAuth = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
-      if (!isAuth)
+      const userData = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+      if (!userData)
          res.status(400).json({
             error: 'Not Authruized',
          });
-
+      req.body.user = userData;
       next();
    } catch (error) {
       res.status(400).json({

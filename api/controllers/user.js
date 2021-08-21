@@ -39,7 +39,7 @@ const signup = async (req, res) => {
       });
 
       const accessToken = jwt.sign(
-         { userName, email },
+         { id: user._id, email },
          process.env.ACCESS_TOKEN_SECRET,
       );
       await user.save();

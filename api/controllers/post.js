@@ -6,11 +6,10 @@ const Post = require('../models/post');
 
 const getPosts = async (req, res) => {
    try {
-      // const { userId } = req.body;
-      // const posts = Post.find({ _id: userId });
-      // res.status(200).json({ posts });
-      //await googleDriver.generatePublicUrl();
-      res.status(200).json({ status: 'SUCCES UPLOAD' });
+      const { userId } = req.body;
+      const posts = Post.find({ _id: userId });
+
+      res.status(200).json({ posts });
    } catch (error) {
       res.status(400).json({
          error,
@@ -21,24 +20,26 @@ const getPosts = async (req, res) => {
 const creatNewPost = async (req, res) => {
    try {
       const { file } = req;
-      const uploadImageData = await googleDriver.uploadFile(file);
-      fs.unlinkSync(file.path);
-      console.log(uploadImageData.data);
+      const { content, userId } = req.body;
+      let imageId = '';
+      if (file) {
+         const uploadImageData = await googleDriver.uploadFile(file);
+         fs.unlinkSync(file.path);
+         console.log(uploadImageData.data);
+         imageId = uploadImageData.data.id;
+      }
 
-      res.status(200).json({ status: 'SUCCES UPLOAD' });
-
-      // const { user, content, image } = req.body;
-      // const post = new Post({
-      //    _id: mongoose.Types.ObjectId(),
-      //    create_date: Date.now(),
-      //    user: user._id,
-      //    content,
-      //    image,
-      // });
-      // await post.save();
-      // res.status(201).json({
-      //    post,
-      // });
+      const post = new Post({
+         _id: mongoose.Types.ObjectId(),
+         create_date: Date.now(),
+         user: userId,
+         content,
+         image: imageId,
+      });
+      await post.save();
+      res.status(201).json({
+         post,
+      });
    } catch (error) {
       res.status(400).json({
          message: error,
