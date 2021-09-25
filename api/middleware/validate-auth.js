@@ -6,7 +6,7 @@ exports.validateAuth = (req, res, next) => {
       const [_, token] = req.headers.authorization.split(' ');
       const userData = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
       if (!userData)
-         res.status(400).json({
+       return  res.status(400).json({
             error: 'Not Authruized',
          });
       req.body.user = userData;
@@ -21,22 +21,24 @@ exports.validateAuth = (req, res, next) => {
 exports.validateSignUp = (req, res, next) => {
    try {
       const singupSchema = Joi.object({
-         userName: Joi.string().min(2).max(30).required(),
          password: Joi.string().min(8).max(10).required(),
-         repeat_password: Joi.any().valid(Joi.ref('password')).required(),
          email: Joi.string().email().required(),
          country: Joi.string(),
          firstName: Joi.string().min(2).max(30).required(),
          lastName: Joi.string().min(2).max(30).required(),
+         birthday: Joi.date().required(),
+         gender: Joi.string().required(),
       });
 
       const { error, value } = singupSchema.validate(req.body);
 
-      if (!error) next();
-
-      res.status(400).json({
+      if (error) return res.status(400).json({
          error,
       });
+      
+      next();
+
+  
    } catch (error) {
       console.log({ error });
       res.status(400).json({

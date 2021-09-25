@@ -6,12 +6,12 @@ const Post = require('../models/post');
 
 const getPosts = async (req, res) => {
    try {
-      const { userId } = req.body;
-      const posts = Post.find({ _id: userId });
+      const {_id } = req.body.user;
+      const posts = await Post.find({user: _id}).sort('-create_date');
 
-      res.status(200).json({ posts });
+      return res.status(200).json({ posts });
    } catch (error) {
-      res.status(400).json({
+    return res.status(400).json({
          error,
       });
    }
@@ -19,6 +19,7 @@ const getPosts = async (req, res) => {
 
 const creatNewPost = async (req, res) => {
    try {
+      console.log('creatNewPost');
       const { file } = req;
       const { content, userId } = req.body;
       let imageId = '';
@@ -35,6 +36,7 @@ const creatNewPost = async (req, res) => {
          user: userId,
          content,
          image: imageId,
+         image_public_url: `https://drive.google.com/uc?export=view&id=${imageId}`
       });
       await post.save();
       res.status(201).json({

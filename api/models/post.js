@@ -6,6 +6,7 @@ const postSchema = mongoose.Schema({
    create_date: { type: Date, required: true },
    content: { type: String, required: true },
    image: String,
+   image_public_url: String,
    likes: { type: Number, default: 0 },
 });
 

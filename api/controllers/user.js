@@ -18,33 +18,43 @@ const login = async (req, res) => {
          { _id: user._id, email },
          process.env.ACCESS_TOKEN_SECRET,
       );
-      res.json({ user, accessToken });
+      return res.json({ user, accessToken });
    } catch (error) {
       console.log({ error });
-      res.status(500).json({
-         message: 'Opration Faild',
+      return res.status(500).json({
+         error
+
       });
    }
 };
 
 const signup = async (req, res) => {
    try {
-      const { userName, email, password } = req.body;
+      const { firstName, lastName, email, password, birthday, gender } = req.body;
+      // const userExist = await User.findOne({ email });
+      // if (userExist) return  res.status(400).json({
+      //    message: 'User exist',
+         
+      // });
       const hash = await bcrypt.hash(password, 8);
       const user = new User({
          _id: mongoose.Types.ObjectId(),
-         userName,
+         firstName,
+         lastName,
          email,
          password: hash,
+         birthday,
+         gender
       });
 
       const accessToken = jwt.sign(
          { id: user._id, email },
          process.env.ACCESS_TOKEN_SECRET,
       );
-      await user.save();
+  
+   await user.save();
 
-      res.status(201).json({
+   return res.status(201).json({
          message: 'User created',
          user,
          accessToken,
@@ -53,8 +63,24 @@ const signup = async (req, res) => {
       console.log({ error });
       res.status(400).json({
          message: 'Opration Faild',
+         error
+         
       });
    }
 };
 
-module.exports = { login, signup };
+const getUserByName = async (req, res) => {
+   try {
+      const {name} = req.query;
+      const users = await User.find({$or: [{firstName: name}, {lastName: name}]})
+      res.status(200).json({
+         mess: 'sending',
+         users
+      })
+
+   } catch (error) {
+      res.status(500).json({errorMessage: error})      
+   }
+};
+
+module.exports = { login, signup , getUserByName};
